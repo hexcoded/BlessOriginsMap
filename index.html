@@ -738,15 +738,22 @@
         });
 
         // Add temporary markers on right-click
-        map.on('contextmenu', function(e) {
-            var tempMarker = L.marker(e.latlng, {
-                icon: L.icon({
-                    iconUrl: 'https://jerzean.github.io/BlessMap/TempMarker.png',
-                    iconSize: [24, 24],
-                    iconAnchor: [12, 24],
-                    popupAnchor: [0, -24]
-                })
-            }).bindPopup("Temporary Marker").addTo(map);
+        map.on('click', function(e) {
+            var latlng = e.latlng;
+			var formattedData = `{lat: ${latlng.lat.toFixed(5)}, lng: ${latlng.lng.toFixed(5)}, popup: "Bag Piece", title: "-"},`;
+            var tempMarker = L.marker(latlng, {
+                draggable: true // Make the marker draggable
+            }).addTo(tempMarkerLayer);
+			tempMarker.bindPopup("Temporary Marker<br>Lat: " + latlng.lat.toFixed(5) + "<br>Lng: " + latlng.lng.toFixed(5) + "<br><br>Formatted Data:<br>" + formattedData).openPopup();
+
+
+            // Update popup with new coordinates on marker drag
+            tempMarker.on('dragend', function(event) {
+                var marker = event.target;
+                var position = marker.getLatLng();
+				var formattedData = `{lat: ${latlng.lat.toFixed(5)}, lng: ${latlng.lng.toFixed(5)}, popup: "Bag Piece", title: "-"},`;
+                marker.setPopupContent("Temporary Marker<br>Lat: " + latlng.lat.toFixed(5) + "<br>Lng: " + latlng.lng.toFixed(5) + "<br><br>Formatted Data:<br>" + formattedData).openPopup();
+            });
         });
 
         // Region Names
