@@ -737,6 +737,18 @@
             });
         });
 
+        // Add temporary markers on right-click
+        map.on('contextmenu', function(e) {
+            var tempMarker = L.marker(e.latlng, {
+                icon: L.icon({
+                    iconUrl: 'https://jerzean.github.io/BlessMap/TempMarker.png',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 24],
+                    popupAnchor: [0, -24]
+                })
+            }).bindPopup("Temporary Marker").addTo(map);
+        });
+
         // Region Names
         var regionLabels = [
             {
