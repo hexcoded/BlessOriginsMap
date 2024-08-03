@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-search/dist/leaflet-search.min.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-animated-searchbox/dist/leaflet-animated-searchbox.min.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-search/dist/leaflet-search.min.js"></script>
     <script src="https://unpkg.com/leaflet-animated-searchbox/dist/leaflet-animated-searchbox.min.js"></script>
@@ -18,7 +17,7 @@
         #map {
             height: 100vh;
             width: 100%;
-            background-image: url("https://jerzean.github.io/BlessMap/MapCanvas.png");
+            background-image: url("https://blesswiki.rgmc.us/Map/MapCanvas.png");
             background-repeat: no-repeat;
             background-size: cover;
         }
@@ -45,21 +44,19 @@
         <h2>Categories</h2>
         <ul id="category-list"></ul>
         <button id="clear-markers">Clear Markers</button>
-        <br><a href="https://github.com/jerzean/BlessMap">Missing A Marker?</a>
+        <br><a href="https://github.com/jerzean/BlessMap">Missing A Marker?<br>Wanna add it?</a>
     </div>
     <div id="map"></div>
     <script>
         var map = L.map('map').setView([0, 0], 2);
-
         // Base map layer
-        L.tileLayer('https://jerzean.github.io/BlessMap/{z}/tile_{x}_{y}.png', {
+        L.tileLayer('https://blesswiki.rgmc.us/Map/{z}/tile_{x}_{y}.png', {
             maxZoom: 6,
             tileSize: 256,
             minZoom: 3,
             preferCanvas: true,
             attribution: 'nareon#0'
         }).addTo(map);
-
 
         // Define categories and their markers
         var categories = [
@@ -393,6 +390,8 @@
 					{lat: -64.07265, lng: -25.17986, popup: "Ancient Chest", title: "-"},
 					{lat: -80.41950, lng: -89.29967, popup: "Ancient Chest", title: "-"},
 					{lat: -82.91660, lng: -47.35473, popup: "Ancient Chest", title: "-"},
+					{lat: 81.20430, lng: 83.53789, popup: "Ancient Chest", title: "-"},
+					{lat: -83.73276, lng: -19.09634, popup: "Ancient Chest", title: "-"},
                 ]
             },
             {
@@ -617,7 +616,8 @@
 					{lat: 68.42258, lng: 64.71206, popup: "Lesser Frost Giants (Rutus Road)", title: "Lesser Frost Giants (Rutus Road) "},
 					{lat: 21.55340, lng: 48.82707, popup: "Cool Banum<br> Tremont Plains", title: "Cool Banum"},
 					{lat: 84.60171, lng: 97.65098, popup: "Knyix<br> Hidden Encampment", title: "Knyix"},
-					{lat: -42.11534, lng: 45.44474, popup: "Messenger Of The Void", title: "Messenger Of The Void"}
+					{lat: -42.11534, lng: 45.44474, popup: "Messenger Of The Void", title: "Messenger Of The Void"},
+					{lat: -72.26822, lng: 28.38540, popup: "Memory Eater", title: "Memory Eater"}
 
                 ]
             },
@@ -681,140 +681,292 @@
                 var markerInstance = L.marker([marker.lat, marker.lng], {icon: icon, title: marker.title})
                     .bindPopup(marker.popup);
                 layerGroup.addLayer(markerInstance);
-                markersLayer.addLayer(markerInstance);
+                markersLayer.addLayer(markerInstance); // Add to search layer
+                
             });
 
-            // Add the layer group to the overlay maps
+            // Add the layer group to the map
+            layerGroup.addTo(map);
+
+            // Add the layer group to the overlay maps for the layer control
             overlayMaps[category.name] = layerGroup;
 
             // Add the category to the sidebar
             var categoryItem = document.createElement('li');
             categoryItem.className = 'category-item';
-            categoryItem.innerHTML = '<input type="checkbox" id="category' + index + '" checked> <label for="category' + index + '">' + category.name + '</label>';
+            var checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = 'category' + index;
+            checkbox.checked = true;
+            var label = document.createElement('label');
+            label.htmlFor = 'category' + index;
+            label.textContent = category.name;
+
+            categoryItem.appendChild(checkbox);
+            categoryItem.appendChild(label);
             document.getElementById('category-list').appendChild(categoryItem);
 
-            // Toggle the category's markers on checkbox change
-            categoryItem.querySelector('input').addEventListener('change', function(e) {
-                if (e.target.checked) {
-                    layerGroup.addTo(map);
+            // Toggle marker group visibility based on checkbox
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    map.addLayer(layerGroup);
                 } else {
                     map.removeLayer(layerGroup);
                 }
             });
-
-            // Initially add the layer group to the map
-            layerGroup.addTo(map);
         });
 
-        // Add search control to the map
-        var searchControl = new L.Control.Search({
-            layer: markersLayer,
-            initial: false,
-            zoom: 6,
-            marker: false,
-            textPlaceholder: 'Search...'
-        });
+        // Add layer control to the map
+        //L.control.layers(null, overlayMaps).addTo(map);
 
-        map.addControl(searchControl);
+        // Create a layer group for temporary markers
+        var tempMarkerLayer = L.layerGroup().addTo(map);
 
-        // Add search box
-        L.control.animatedSearchBox({
-            position: "topleft",
-            callback: function(text) {
-                // Perform search
-                searchControl.searchText(text);
-            }
-        }).addTo(map);
-
-        // Handle clearing markers
-        document.getElementById('clear-markers').addEventListener('click', function() {
-            categories.forEach(function(category, index) {
-                var checkbox = document.getElementById('category' + index);
-                if (checkbox.checked) {
-                    map.removeLayer(overlayMaps[category.name]);
-                    checkbox.checked = false;
-                }
-            });
-        });
-
-        // Add temporary markers on right-click
+        // Add event listener to place temporary markers
         map.on('click', function(e) {
             var latlng = e.latlng;
-			var formattedData = `{lat: ${latlng.lat.toFixed(5)}, lng: ${latlng.lng.toFixed(5)}, popup: "Bag Piece", title: "-"},`;
+            var formattedData = `{lat: ${latlng.lat.toFixed(5)}, lng: ${latlng.lng.toFixed(5)}, popup: "Bag Piece", title: "-"},`;
             var tempMarker = L.marker(latlng, {
                 draggable: true // Make the marker draggable
             }).addTo(tempMarkerLayer);
-			tempMarker.bindPopup("Temporary Marker<br>Lat: " + latlng.lat.toFixed(5) + "<br>Lng: " + latlng.lng.toFixed(5) + "<br><br>Formatted Data:<br>" + formattedData).openPopup();
-
+            tempMarker.bindPopup("Temporary Marker<br>Lat: " + latlng.lat.toFixed(5) + "<br>Lng: " + latlng.lng.toFixed(5) + "<br><br>Formatted Data:<br>" + formattedData).openPopup();
 
             // Update popup with new coordinates on marker drag
             tempMarker.on('dragend', function(event) {
                 var marker = event.target;
                 var position = marker.getLatLng();
-				var formattedData = `{lat: ${latlng.lat.toFixed(5)}, lng: ${latlng.lng.toFixed(5)}, popup: "Bag Piece", title: "-"},`;
-                marker.setPopupContent("Temporary Marker<br>Lat: " + latlng.lat.toFixed(5) + "<br>Lng: " + latlng.lng.toFixed(5) + "<br><br>Formatted Data:<br>" + formattedData).openPopup();
+                var formattedData = `{lat: ${position.lat.toFixed(5)}, lng: ${position.lng.toFixed(5)}, popup: "Bag Piece", title: "-"},`;
+                marker.setPopupContent("Temporary Marker<br>Lat: " + position.lat.toFixed(5) + "<br>Lng: " + position.lng.toFixed(5) + "<br><br>Formatted Data:<br>" + formattedData).openPopup();
             });
         });
 
-        // Region Names
-        var regionLabels = [
+        // Clear temporary markers
+        document.getElementById('clear-markers').addEventListener('click', function() {
+            tempMarkerLayer.clearLayers();
+        });
+
+        // Search control
+        var searchControl = new L.Control.Search({
+            layer: markersLayer,
+            initial: false,
+            zoom: 12,
+            marker: false
+        });
+
+        map.addControl(searchControl);
+
+        // Add text overlays for countries and cities
+        var locations = [
             {
-                latlng: [-50, 0],
-                name: "Central Plains"
+                country: "North Sperios",
+                lat: 45.0,
+                lng: 28.5,
+                cities: [
+                    {lat: 58.97371, lng: 6.41366, text: "North Sperios"},
+                    {lat: 56.72674, lng: 14.36632, text: "North Callen Dam"},
+                    {lat: 53.69373, lng: 19.15566, text: "Whiterock Quarry"},
+					{lat: 51.75054, lng: 24.95559, text: "Callen Highlands"},
+					{lat: 48.56986, lng: 21.30866, text: "Callen Village"},
+					{lat: 39.39731, lng: 36.62370, text: "Torbellino Hills"},
+					{lat: 53.22584, lng: 38.22672, text: "Firefly Peak"},
+					{lat: 58.70135, lng: 46.66299, text: "Future World Boss location"},
+					
+					
+					
+					
+					
+                ]
             },
             {
-                latlng: [50, 50],
-                name: "Northern Mountains"
+                country: "South Sperios",
+                lat: 0,
+                lng: 28.5,
+                cities: [
+                    {lat: 22.91523, lng: 5.5, text: "South Sperios"},
+                    {lat: -8.37053, lng: 24.07685, text: "Hermit Hill"},
+                    {lat: 11.04795, lng: 46.52963, text: "Tremont Plains"},
+					{lat: -5.57830, lng: 41.56454, text: "South Sperios Patrol Camp"},
+					{lat: -10.27838, lng: 41.65290, text: "Avera Plains"},
+					{lat: -17.94565, lng: 33.48026, text: "Verde Acres"},
+					
+					
+					
+                ]
+            },
+            {
+                country: "Carzacor",
+                lat: -45,
+                lng: 32,
+                cities: [
+                    {lat: -35.69303, lng: 26.85046, text: "Carzacor"},
+                    {lat: 43.7102, lng: 7.2620, text: "Nice"},
+                    {lat: 45.7640, lng: 4.8357, text: "Lyon"}
+                ]
+            },
+            {
+                country: "Navarra",
+                lat: -45,
+                lng: -18,
+                cities: [
+                    {lat: 35.6895, lng: 139.6917, text: "T"},
+                    {lat: 35.0116, lng: 135.7681, text: "T"},
+                    {lat: 43.0621, lng: 141.3544, text: "S"}
+                ]
+            },
+            {
+                country: "Gnoll Wastes",
+                lat: -70,
+                lng: -22,
+                cities: [
+                    {lat: 35.6895, lng: 139.6917, text: "T"}
+                ]
+            },
+            {
+                country: "Ruins of Tristezza",
+                lat: -70,
+                lng: 32,
+                cities: [
+                    {lat: 35.6895, lng: 139.6917, text: "T"}
+                ]
+            },
+            {
+                country: "Timeless Jungle",
+                lat: -82,
+                lng: -25,
+                cities: [
+                    {lat: 35.6895, lng: 139.6917, text: "T"}
+                    
+                ]
+            },
+            {
+                country: "Zenkala",
+                lat: -82,
+                lng: -70,
+                cities: [
+                    {lat: 35.6895, lng: 139.6917, text: "T"}
+                    
+                ]
+            },
+            {
+                country: "Ivory Dunes",
+                lat: -70.5,
+                lng: -75,
+                cities: [
+                    {lat: 35.6895, lng: 139.6917, text: "T"}
+                    
+                ]
+            },
+            {
+                country: "Padana Ruins",
+                lat: 45,
+                lng: 78,
+                cities: [
+                    {lat: 35.6895, lng: 139.6917, text: "T"}
+                    
+                ]
+            },
+            {
+                country: "Kannus Mountains",
+                lat: 73,
+                lng: 80,
+                cities: [
+                    {lat: 35.6895, lng: 139.6917, text: "T"}
+                    
+                ]
+            },
+            {
+                country: "Kannus Valley",
+                lat: 72,
+                lng: 28,
+                cities: [
+                    {lat: 35.6895, lng: 139.6917, text: "T"}
+                    
+                ]
+            },
+            {
+                country: "Beoran",
+                lat: 82.5,
+                lng: 82,
+                cities: [
+                    {lat: 35.6895, lng: 139.6917, text: "T"}
+                    
+                ]
+            },
+            {
+                country: "Ostium",
+                lat: 82.5,
+                lng: 32.5,
+                cities: [
+                    {lat: 35.6895, lng: 139.6917, text: "T"}
+                    
+                ]
+            },
+            {
+                country: "Eidolon Forest",
+                lat: 82.5,
+                lng: -23,
+                cities: [
+                    {lat: 35.6895, lng: 139.6917, text: "T"}
+                    
+                ]
             }
         ];
 
-        // City Names
-        var cityLabels = [
-            {
-                latlng: [-30, -30],
-                name: "Desert City"
-            },
-            {
-                latlng: [40, 40],
-                name: "Forest Town"
+        // Layer groups for country and city markers
+        var countryLayer = L.layerGroup();
+        var cityLayer = L.layerGroup();
+
+        // Adding text overlays for countries and cities
+        locations.forEach(function(location) {
+            // Add country text overlay
+            console.log("Adding country: " + location.country);
+            var countryTextIcon = L.divIcon({
+                className: 'text-marker',
+                html: `<span style="font-size:18px; background-color: rgba(246, 240, 133, 0); font-weight: bold; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); color: rgba(228, 217, 112, 1); padding: 2px;">${location.country}</span>`,
+                iconSize: [150, 20]
+            });
+
+            L.marker([location.lat, location.lng], {
+                icon: countryTextIcon,
+                zIndexOffset: 1000 // Ensure country text is on top
+            }).addTo(countryLayer);
+
+            // Add city text overlays
+            location.cities.forEach(function(city) {
+                console.log("Adding city: " + city.text);
+                var cityTextIcon = L.divIcon({
+                    className: 'text-marker',
+                    html: `<span style="font-size:18px; background-color: rgba(246, 240, 133, 0); font-weight: bold; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); color: rgba(179, 179, 179, 1); padding: 2px;">${city.text}</span>`,
+                    iconSize: [150, 20]
+                });
+
+                L.marker([city.lat, city.lng], {
+                    icon: cityTextIcon,
+                    zIndexOffset: 1000 // Ensure city text is on top
+                }).addTo(cityLayer);
+            });
+        });
+
+        // Add the country layer to the map by default
+        countryLayer.addTo(map);
+
+        // Zoom level at which to toggle visibility
+        var toggleZoomLevel = 5; // Adjust this based on your map's zoom scale
+
+        // Add a zoomend event listener to toggle marker visibility based on zoom level
+        map.on('zoomend', function() {
+            var currentZoom = map.getZoom();
+            console.log("Current zoom level: " + currentZoom);
+
+            if (currentZoom >= toggleZoomLevel) {
+                map.addLayer(cityLayer);   // Show city markers
+                map.removeLayer(countryLayer); // Hide country markers
+            } else {
+                map.addLayer(countryLayer); // Show country markers
+                map.removeLayer(cityLayer); // Hide city markers
             }
-        ];
+        });
 
-        function createLabel(latlng, name, className) {
-            return L.marker(latlng, {
-                icon: L.divIcon({
-                    className: className,
-                    html: name,
-                    iconSize: [100, 30]
-                })
-            }).addTo(map);
-        }
-
-        // Add region and city names
-        var regionMarkers = regionLabels.map(region => createLabel(region.latlng, region.name, 'region-label'));
-        var cityMarkers = cityLabels.map(city => createLabel(city.latlng, city.name, 'city-label'));
-
-        // Show/hide labels based on zoom level
-        function updateLabels() {
-            var zoom = map.getZoom();
-            regionMarkers.forEach(marker => {
-                if (zoom < 4) {
-                    map.removeLayer(marker);
-                } else {
-                    map.addLayer(marker);
-                }
-            });
-            cityMarkers.forEach(marker => {
-                if (zoom < 6) {
-                    map.removeLayer(marker);
-                } else {
-                    map.addLayer(marker);
-                }
-            });
-        }
-
-        map.on('zoomend', updateLabels);
-        updateLabels(); // Initial call to set label visibility
     </script>
 </body>
 </html>
