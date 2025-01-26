@@ -1,9 +1,8 @@
 This is a interactive map for Bless Unleashed
-https://jerzean.github.io/BlessMap/
+https://hexcoded.github.io/BlessOriginsMap/
 
-Made by Nareon#0 on discord
 
-instructions to add items
+Instructions to add items
 1. Click/create a temp marker where said item should be
 2. Copy the formated location data in the popup for said marker
 3. Paste said data into the index.html under the correct category(MAKE SURE IF YOU ARE ADDING MULTIPLE ITEMS THERE IS A "," BETWEEN THEM)
