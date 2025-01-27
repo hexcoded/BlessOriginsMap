@@ -17,7 +17,7 @@
         #map {
             height: 100vh;
             width: 100%;
-            background-image: url("https://jerzean.github.io/BlessMap/Map/MapCanvas.png");
+            background-image: url("https://hexcoded.github.io/BlessOriginsMap/Map/MapCanvas.png");
             background-repeat: no-repeat;
             background-size: cover;
         }
@@ -44,25 +44,25 @@
         <h2>Categories</h2>
         <ul id="category-list"></ul>
         <button id="clear-markers">Clear Markers</button>
-        <br><a href="https://github.com/jerzean/BlessMap">Missing A Marker?<br>Wanna add it?</a>
+        <br><a href="https://github.com/hexcoded/BlessOriginsMap">Missing A Marker?<br>Wanna add it?</a>
     </div>
     <div id="map"></div>
     <script>
         var map = L.map('map').setView([0, 0], 2);
         // Base map layer
-        L.tileLayer('https://jerzean.github.io/BlessMap/Map/{z}/tile_{x}_{y}.png', {
+        L.tileLayer('https://hexcoded.github.io/BlessOriginsMap/Map/{z}/tile_{x}_{y}.png', {
             maxZoom: 6,
             tileSize: 256,
             minZoom: 3,
             preferCanvas: true,
-            attribution: 'Made by <a href="https://discordapp.com/channels/@me/Nareon/">Nareon</a>'
+            attribution: 'Made by <a href="https://discordapp.com/channels/@me/hexc0de/">HexCode</a>'
         }).addTo(map);
 
         // Define categories and their markers
         var categories = [
             {
                 name: "Bag Piece",
-                iconUrl: "https://jerzean.github.io/BlessMap/ChestN.png",
+                iconUrl: "https://hexcoded.github.io/BlessOriginsMap/ChestN.png",
                 markers: [
                     {lat: 84.41450, lng: 60.21596, popup: "Bag Piece", title: "-"},
 					{lat: 84.07727, lng: 53.04471, popup: "Bag Piece", title: "-"},
@@ -381,7 +381,7 @@
             },
             {
                 name: "Ancient Chest",
-                iconUrl: "https://jerzean.github.io/BlessMap/ChestA.png",
+                iconUrl: "https://hexcoded.github.io/BlessOriginsMap/ChestA.png",
                 markers: [
 					{lat: 78.23299, lng: -13.04612, popup: "Ancient Chest", title: "-"},
 					{lat: -83.86839, lng: -11.99405, popup: "Ancient Chest", title: "-"},
@@ -397,7 +397,7 @@
             },
             {
                 name: "Telepost",
-                iconUrl: "https://jerzean.github.io/BlessMap/Telepost.png",
+                iconUrl: "https://hexcoded.github.io/BlessOriginsMap/Telepost.png",
                 markers: [
 					{lat: 83.85084, lng: -28.30348, popup: "Telepost", title: "-"},
 					{lat: 82.32593, lng: -14.08826, popup: "Telepost", title: "-"},
@@ -490,7 +490,7 @@
             },
 			{
                 name: "Pyre",
-                iconUrl: "https://jerzean.github.io/BlessMap/Pyre.png",
+                iconUrl: "https://hexcoded.github.io/BlessOriginsMap/Pyre.png",
                 markers: [
                     {lat: 83.58926, lng: -28.69887, popup: "Pyre", title: "-"},
 					{lat: 82.48315, lng: -14.61594, popup: "Pyre", title: "-"},
@@ -568,7 +568,7 @@
             },
 			{
                 name: "Elite Boss",
-                iconUrl: "https://jerzean.github.io/BlessMap/EBoss.png",
+                iconUrl: "https://hexcoded.github.io/BlessOriginsMap/EBoss.png",
                 markers: [
                     {lat: -15.66561, lng: 38.09401, popup: "Wolf King<br>Pasture's Crossing", title: "Wolf King"},
 					{lat: -43.58399, lng: 42.82112, popup: "Corrupted Treant<br> Castra Magnus", title: "Corrupted Treant"},
@@ -625,7 +625,7 @@
             },
 			{
                 name: "Unique Boss",
-                iconUrl: "https://jerzean.github.io/BlessMap/UBoss.png",
+                iconUrl: "https://hexcoded.github.io/BlessOriginsMap/UBoss.png",
                 markers: [
                     {lat: -84.17261, lng: -19.44365, popup: "Osis<br> Forgotten Marsh", title: "Osis"},
 					{lat: -75.27042, lng: 9.27602, popup: "Cyclops<br> Dimensional Rift", title: "Cyclops"},
@@ -641,7 +641,7 @@
             },
 			{
                 name: "Smuggler Merchant",
-                iconUrl: "https://jerzean.github.io/BlessMap/SmugMerch.png",
+                iconUrl: "https://hexcoded.github.io/BlessOriginsMap/SmugMerch.png",
                 markers: [
                     {lat: 83.53013, lng: -26.58135, popup: "Smuggler<br> Spawn location", title: "-"},
 					{lat: 84.26943, lng: 9.96013, popup: "Smuggler<br> Spawn location", title: "-"},
@@ -660,7 +660,7 @@
             },
 			{
                 name: "Mount Locations",
-                iconUrl: "https://jerzean.github.io/BlessMap/SmugMerch.png",
+                iconUrl: "https://hexcoded.github.io/BlessOriginsMap/SmugMerch.png",
                 markers: [
                     {lat: 79.21525, lng: -43.57241, popup: "Stag", title: "Stag"},
 					{lat: 79.97699, lng: -35.39977, popup: "not sure of the name", title: "Mount spawn"}
