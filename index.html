@@ -30,7 +30,8 @@
             background-repeat: no-repeat;
             background-size: cover;
         }
-        #sidebar {
+	    
+        /* #sidebar {
             position: absolute;
             top: 85px;
             left: 10px;
@@ -44,7 +45,27 @@
 	    font-family: 'Marcellus SC', sans-serif;	
 	    border-radius: 10px;
             font-size: 12px;
-        }
+        } */
+	    #sidebar {
+    position: absolute;
+    top: 85px;
+    left: -210px; /* Move the sidebar out of view by default */
+    width: 200px;
+    background: rgba(255, 255, 255, 0.5);
+    padding: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    z-index: 410;
+    overflow-y: auto;
+    max-height: 90vh;
+    font-family: 'Marcellus SC', sans-serif;	
+    border-radius: 10px;
+    font-size: 12px;
+    transition: left 0.3s ease; /* Smooth transition for the sidebar */
+}
+
+#sidebar:hover {
+    left: 10px; /* Move the sidebar into view on hover */
+}
         .category-item {
             margin-bottom: 10px;
         }
