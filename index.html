@@ -46,25 +46,26 @@
 	    border-radius: 10px;
             font-size: 12px;
         } */
-	    #sidebar {
+#sidebar {
     position: absolute;
     top: 85px;
-    left: -210px; /* Move the sidebar out of view by default */
-    width: 200px;
+    left: 0;
+    width: 30px; /* Only show a small part of the sidebar by default */
     background: rgba(255, 255, 255, 0.5);
     padding: 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     z-index: 410;
-    overflow-y: auto;
+    overflow: hidden; /* Hide the content by default */
     max-height: 90vh;
     font-family: 'Marcellus SC', sans-serif;	
     border-radius: 10px;
     font-size: 12px;
-    transition: left 0.3s ease; /* Smooth transition for the sidebar */
+    transition: width 0.3s ease; /* Smooth transition for the width */
 }
 
 #sidebar:hover {
-    left: 10px; /* Move the sidebar into view on hover */
+    width: 200px; /* Expand the sidebar to full width on hover */
+    overflow-y: auto; /* Allow scrolling when expanded */
 }
         .category-item {
             margin-bottom: 10px;
