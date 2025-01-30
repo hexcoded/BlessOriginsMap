@@ -102,8 +102,7 @@
     </style>
 </head>
 <body>
-    <div id="sidebar">
-        <br>^^^ Search Markers
+    <div id="sidebar">        
         <h2>Categories</h2>
         <ul id="category-list"></ul>
         <button id="clear-markers">Clear Markers</button>
@@ -1126,7 +1125,7 @@
         // Add event listener to place temporary markers
         map.on('click', function(e) {
             var latlng = e.latlng;
-            var formattedData = `{lat: ${latlng.lat.toFixed(5)}, lng: ${latlng.lng.toFixed(5)}, popup: "Bag Piece", title: "-"},`;
+            var formattedData = `{lat: ${latlng.lat.toFixed(5)}, lng: ${latlng.lng.toFixed(5)}, popup: "Custom Marker", title: "-"},`;
             var tempMarker = L.marker(latlng, {
                 draggable: true // Make the marker draggable
             }).addTo(tempMarkerLayer);
